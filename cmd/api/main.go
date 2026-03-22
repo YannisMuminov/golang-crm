@@ -54,6 +54,7 @@ func main() {
 
 	routes.AuthRoutes(r, cfg)
 	routes.ClientRoutes(r, cfg)
+	routes.DealRoutes(r, cfg)
 
 	addr := fmt.Sprintf(":%s", cfg.Server.AppPort)
 	srv := &http.Server{

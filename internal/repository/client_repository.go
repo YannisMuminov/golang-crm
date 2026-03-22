@@ -148,7 +148,7 @@ func (c *clientRepository) GetAll(ctx context.Context, filter domain.ClientFilte
 
 func (c *clientRepository) Update(ctx context.Context, client *domain.Client) error {
 	query := `UPDATE clients
-SET first_name = $1,
+	SET first_name = $1,
     last_name = $2,
     email = $3,
     phone = $4,

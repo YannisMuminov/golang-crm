@@ -8,7 +8,7 @@ type User struct {
 	PasswordHash string    `db:"password_hash"`
 	FirstName    string    `db:"first_name"`
 	LastName     string    `db:"last_name"`
-	RoleID       int64     `db:"role_id"`
+	RoleID       int       `db:"role_id"`
 	IsActive     bool      `db:"is_active"`
 	CreatedAt    time.Time `db:"created_at"`
 	UpdatedAt    time.Time `db:"updated_at"`

@@ -12,8 +12,8 @@ import (
 
 func ClientRoutes(r *gin.Engine, cfg *config.Config) {
 	clientRepo := repository.NewClientRepository(database.GetDB())
-	clientSrv := service.NewClientService(clientRepo)
-	clientHandler := handler.NewClientHandler(clientSrv)
+	clientService := service.NewClientService(clientRepo)
+	clientHandler := handler.NewClientHandler(clientService)
 
 	clients := r.Group("/clients")
 	clients.Use(middleware.RequireAuth(&cfg.JWT))

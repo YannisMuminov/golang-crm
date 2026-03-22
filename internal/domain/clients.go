@@ -6,16 +6,16 @@ import (
 )
 
 type Client struct {
-	ID        int64     `db:"id"`
-	FirstName string    `db:"first_name"`
-	LastName  string    `db:"last_name"`
-	Email     string    `db:"email"`
-	Phone     string    `db:"phone"`
-	Company   string    `db:"company"`
-	Notes     string    `db:"notes"`
-	CreatedBy int64     `db:"created_by"`
-	CreatedAt time.Time `db:"created_at"`
-	UpdatedAt time.Time `db:"updated_at"`
+	ID        int64     `db:"id"         json:"id"`
+	FirstName string    `db:"first_name" json:"first_name"`
+	LastName  string    `db:"last_name"  json:"last_name"`
+	Email     string    `db:"email"      json:"email"`
+	Phone     string    `db:"phone"      json:"phone"`
+	Company   string    `db:"company"    json:"company"`
+	Notes     string    `db:"notes"      json:"notes"`
+	CreatedBy int64     `db:"created_by" json:"created_by"`
+	CreatedAt time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 }
 
 type ClientCreateRequest struct {
@@ -59,7 +59,7 @@ type ClientService interface {
 }
 
 func (f *ClientFilter) Offset() int {
-	if f.Page < 1 {
+	if f.Page <= 1 {
 		return 0
 	}
 	return (f.Page - 1) * f.Limit
