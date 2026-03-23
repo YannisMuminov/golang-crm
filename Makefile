@@ -57,6 +57,11 @@ migrate-down: ## Откатить миграции вниз
 	@echo "$(YELLOW)Rolling back migrations...$(NC)"
 	@migrate -path ./migrations -database "postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=$(DB_SSLMODE)" down
 
+
+migrate-force:
+	@echo "$(YELLOW)Forcing migration version to $(VERSION)...$(NC)"
+	@migrate -path ./migrations -database "postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=$(DB_SSLMODE)" force $(VERSION)
+
 install-deps: ## Установить все зависимости
 	@echo "$(GREEN)Installing dependencies...$(NC)"
 	@go mod download
