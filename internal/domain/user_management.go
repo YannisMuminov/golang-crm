@@ -19,7 +19,7 @@ type UserRepository interface {
 	GetAll(ctx context.Context, filter UserFilter) ([]User, int, error)
 	GetByID(ctx context.Context, id int64) (*User, error)
 	Update(ctx context.Context, user *User) error
-	SetActive(ctx context.Context, id int64, isActive *bool) error
+	SetActive(ctx context.Context, id int64, isActive bool) error
 }
 
 type UserService interface {
