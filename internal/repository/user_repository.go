@@ -37,32 +37,38 @@ func (r *userRepository) GetAll(ctx context.Context, filter domain.UserFilter) (
 	}
 
 	where := ""
+
 	if len(conditions) > 0 {
 		where = " WHERE " + strings.Join(conditions, " AND ")
 	}
 
 	countQuery := "SELECT COUNT(*) FROM users" + where
 	var total int
+
 	if err := r.db.QueryRowContext(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, fmt.Errorf("count users: %w", err)
 	}
 
 	dataQuery := fmt.Sprintf(`
-		SELECT id, email, first_name, last_name, role_id, is_active, created_at, updated_at
-		FROM users%s
-		ORDER BY created_at DESC
-		LIMIT $%d OFFSET $%d`,
+			SELECT id, email, first_name, last_name, role_id, is_active, created_at, updated_at
+			FROM users%s
+			ORDER BY created_at DESC
+			LIMIT $%d, OFFSET $%d`,
 		where, argIdx, argIdx+1,
 	)
-	args = append(args, filter.Limit, filter.Offset())
+
+	args = append(args, filter.Limit, filter.Offset)
 
 	rows, err := r.db.QueryContext(ctx, dataQuery, args...)
+
 	if err != nil {
-		return nil, 0, fmt.Errorf("get all users: %w", err)
+		return nil, 0, fmt.Errorf("get users: %w", err)
 	}
+
 	defer rows.Close()
 
 	var users []domain.User
+
 	for rows.Next() {
 		var u domain.User
 		if err := rows.Scan(
@@ -75,8 +81,9 @@ func (r *userRepository) GetAll(ctx context.Context, filter domain.UserFilter) (
 			&u.CreatedAt,
 			&u.UpdatedAt,
 		); err != nil {
-			return nil, 0, fmt.Errorf("scan user: %w", err)
+			return nil, 0, fmt.Errorf("get users: %w", err)
 		}
+
 		users = append(users, u)
 	}
 
@@ -85,12 +92,12 @@ func (r *userRepository) GetAll(ctx context.Context, filter domain.UserFilter) (
 
 func (r *userRepository) GetByID(ctx context.Context, id int64) (*domain.User, error) {
 	query := `
-		SELECT id, email, first_name, last_name, role_id, is_active, created_at, updated_at
-		FROM users
-		WHERE id = $1`
+	   	 SELECT id, email, first_name, last_name, role_id, is_active, created_at, updated_at
+		FROM users WHERE id = $1`
 
 	var user domain.User
-	err := r.db.QueryRowContext(ctx, query, id).Scan(
+
+	if err := r.db.QueryRowxContext(ctx, query, id).Scan(
 		&user.ID,
 		&user.Email,
 		&user.FirstName,
@@ -99,50 +106,51 @@ func (r *userRepository) GetByID(ctx context.Context, id int64) (*domain.User, e
 		&user.IsActive,
 		&user.CreatedAt,
 		&user.UpdatedAt,
-	)
-	if err != nil {
+	); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil
 		}
-		return nil, fmt.Errorf("get user by id: %w", err)
+		return nil, fmt.Errorf("get user: %w", err)
 	}
+
 	return &user, nil
+
 }
 
 func (r *userRepository) Update(ctx context.Context, user *domain.User) error {
 	query := `
-		UPDATE users
+	UPDATE users 
 		SET first_name = $1,
-		    last_name  = $2,
-		    role_id    = $3,
+		    last_name = $2,
+		    role_id = $3,
 		    updated_at = NOW()
 		WHERE id = $4
 		RETURNING updated_at`
 
-	err := r.db.QueryRowContext(
+	if err := r.db.QueryRowContext(
 		ctx, query,
 		user.FirstName,
 		user.LastName,
-		user.RoleID,
+		user.Role,
 		user.ID,
-	).Scan(&user.UpdatedAt)
-
-	if err != nil {
+	).Scan(&user.UpdatedAt); err != nil {
 		return fmt.Errorf("update user: %w", err)
 	}
+
 	return nil
 }
 
 func (r *userRepository) SetActive(ctx context.Context, id int64, isActive bool) error {
 	query := `
-		UPDATE users
-		SET is_active  = $1,
-		    updated_at = NOW()
-		WHERE id = $2`
+ 			UPDATE users
+			SET is_active = $1,
+			    updated_at = NOW()
+ 			WHERE id = $2`
 
 	_, err := r.db.ExecContext(ctx, query, isActive, id)
+
 	if err != nil {
-		return fmt.Errorf("set user active: %w", err)
+		return fmt.Errorf("update users: %w", err)
 	}
 	return nil
 }

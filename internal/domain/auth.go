@@ -27,7 +27,7 @@ type AuthRepository interface {
 	CreateUser(ctx context.Context, user *User) error
 	GetUserByEmail(ctx context.Context, email string) (*User, error)
 	GetUserByID(ctx context.Context, id int64) (*User, error)
-	GetRolePermissions(ctx context.Context, roleID int) (*Role, []Permission, error)
+	GetRolePermissions(ctx context.Context, roleID int64) (*Role, []Permission, error)
 }
 
 type AuthService interface {
