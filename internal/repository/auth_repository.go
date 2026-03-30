@@ -99,7 +99,7 @@ func (a authRepository) GetUserByID(ctx context.Context, id int64) (*domain.User
 	return &user, nil
 }
 
-func (a authRepository) GetRolePermissions(ctx context.Context, roleID int) (*domain.Role, []domain.Permission, error) {
+func (a authRepository) GetRolePermissions(ctx context.Context, roleID int64) (*domain.Role, []domain.Permission, error) {
 	roleQuery := `
 	SELECT id, name, description, created_at, updated_at
 	FROM roles
