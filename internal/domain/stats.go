@@ -3,12 +3,12 @@ package domain
 import "context"
 
 type DealStats struct {
-	Total       int `json:"total"`
-	Won         int `json:"won"`
-	Lost        int `json:"lost"`
-	InProgress  int `json:"in_progress"`
-	TotalAmount int `json:"total_amount"`
-	WonAmount   int `json:"won_amount"`
+	Total       int     `json:"total"`
+	Won         int     `json:"won"`
+	Lost        int     `json:"lost"`
+	InProgress  int     `json:"in_progress"`
+	TotalAmount float64 `json:"total_amount"`
+	WonAmount   float64 `json:"won_amount"`
 }
 
 type ClientStats struct {

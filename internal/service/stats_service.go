@@ -17,8 +17,30 @@ func NewStatsService(db *sqlx.DB) domain.StatsService {
 }
 
 func (s *statsService) GetStats(ctx context.Context) (*domain.Stats, error) {
-	//TODO implement me
-	panic("implement me")
+	var stats domain.Stats
+	var err error
+
+	stats.Deals, err = s.getDealStats(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("get deal stats: %w", err)
+	}
+
+	stats.Clients, err = s.getClientStats(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("get client stats: %w", err)
+	}
+
+	stats.Task, err = s.getTaskStats(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("get task stats: %w", err)
+	}
+
+	stats.Users, err = s.getUserStats(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("get user stats: %w", err)
+	}
+
+	return &stats, nil
 }
 
 func (s *statsService) getDealStats(ctx context.Context) (domain.DealStats, error) {
@@ -71,7 +93,7 @@ func (s *statsService) getClientStats(ctx context.Context) (domain.ClientStats, 
 	return stats, nil
 }
 
-func (s *statsService) getTasksStats(ctx context.Context) (domain.TaskStats, error) {
+func (s *statsService) getTaskStats(ctx context.Context) (domain.TaskStats, error) {
 	query := `
 		SELECT
     COUNT(*) AS total,
@@ -93,11 +115,11 @@ func (s *statsService) getTasksStats(ctx context.Context) (domain.TaskStats, err
 	return stats, nil
 }
 
-func (s *statsService) getUsersStats(ctx context.Context) (domain.UserStats, error) {
+func (s *statsService) getUserStats(ctx context.Context) (domain.UserStats, error) {
 	query := `
 		SELECT 
 		COUNT(*) AS total,
-		COUNT(CASE WHEN is_active = 'is_active' THEN 1 END) AS is_active,
+		COUNT(CASE WHEN is_active = true THEN 1 END) AS is_active
 		FROM users
 `
 	var stats domain.UserStats

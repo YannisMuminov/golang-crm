@@ -48,7 +48,7 @@ type UpdateTaskRequest struct {
 	Description string     `json:"description"`
 	Status      TaskStatus `json:"status"`
 	AssignedTo  int64      `json:"assigned_to"`
-	DueDate     *time.Time `json:"due_date"`
+	DueDate     *time.Time `json:"due_data"`
 }
 
 type TaskFilter struct {
