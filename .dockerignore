@@ -1,0 +1,23 @@
+# Git
+.git
+.gitignore
+ 
+# Бинарники
+*.exe
+*.out
+crm-admin
+ 
+# Временные файлы
+tmp/
+.tmp/
+
+ 
+# IDE файлы
+.idea/
+.vscode/
+*.swp
+ 
+# Docker файлы (не нужны внутри контейнера)
+Dockerfile
+docker-compose.yml
+.dockerignore

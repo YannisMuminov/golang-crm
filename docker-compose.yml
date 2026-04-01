@@ -1,0 +1,64 @@
+version: "3.9"
+
+services:
+  # ─── PostgreSQL ─────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine # официальный образ PostgreSQL
+    container_name: crm_postgres
+    restart: unless-stopped # перезапускать если упал, но не если остановили вручную
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432" # хост:контейнер — можно подключиться из pgAdmin
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # данные не теряются при перезапуске
+    healthcheck:
+      # Проверяем что PostgreSQL готов принимать соединения
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s # проверяем каждые 5 секунд
+      timeout: 5s # ждём ответа 5 секунд
+      retries: 5 # после 5 неудач — считаем unhealthy
+
+  migrate:
+    image: migrate/migrate
+    container_name: crm_migrate
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./migrations:/migrations
+    command: >
+      -path=/migrations
+      -database=postgres://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}?sslmode=disable
+      up
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: crm_app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    ports:
+      - "8080:8080"
+    environment:
+      APP_PORT: ${APP_PORT}
+      APP_ENV: ${APP_ENV}
+      DB_HOST: postgres
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_SSLMODE: ${DB_SSLMODE}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRE_MINUTES: ${JWT_EXPIRE_MINUTES}
+      JWT_REFRESH_EXPIRE_HOURS: ${JWT_REFRESH_EXPIRE_HOURS}
+
+volumes:
+  postgres_data:
